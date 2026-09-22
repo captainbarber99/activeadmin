@@ -40,7 +40,7 @@ module ActiveAdmin
 
     # Store relations that should be included
     def includes(*args)
-      config.includes.push *args
+      config.includes.push(*args)
     end
 
     #
@@ -154,6 +154,19 @@ module ActiveAdmin
       action config.collection_actions, name, options, &block
     end
 
+    # Set the default `filters` list for this resource's string filters.
+    # Takes priority over the namespace-level `string_input_filters` setting.
+    #
+    # For example:
+    #
+    #   ActiveAdmin.register Post do
+    #     string_input_filters [:eq, :cont]
+    #   end
+    #
+    def string_input_filters(value)
+      config.string_input_filters = value
+    end
+
     def decorate_with(decorator_class)
       # Force storage as a string. This will help us with reloading issues.
       # Assuming decorator_class.to_s will return the name of the class allows
@@ -192,8 +205,8 @@ module ActiveAdmin
     delegate :before_destroy, :after_destroy, to: :controller
 
     standard_rails_filters =
-      AbstractController::Callbacks::ClassMethods.public_instance_methods.select { |m| m.match(/_action\z/) }
-    delegate *standard_rails_filters, to: :controller
+      AbstractController::Callbacks::ClassMethods.public_instance_methods.select { |m| m.end_with?('_action') }
+    delegate(*standard_rails_filters, to: :controller)
 
     # Specify which actions to create in the controller
     #

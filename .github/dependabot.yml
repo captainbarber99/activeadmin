@@ -1,40 +1,63 @@
----
-
 version: 2
-
+multi-ecosystem-groups:
+  bundler:
+    schedule:
+      interval: weekly
 updates:
-  - package-ecosystem: bundler
+  - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: daily
+    cooldown:
+      default-days: 5
+    groups:
+      github_actions:
+        patterns:
+          - "*"
+  - package-ecosystem: bundler
+    directory: /
     versioning-strategy: lockfile-only
-
+    cooldown:
+      default-days: 5
+    patterns:
+      - "*"
+    multi-ecosystem-group: bundler
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: daily
+      interval: monthly
     versioning-strategy: lockfile-only
-
+    cooldown:
+      default-days: 5
+    groups:
+      npm:
+        patterns:
+          - "*"
   - package-ecosystem: bundler
-    directory: /docs
-    schedule:
-      interval: daily
+    directory: /gemfiles/rails_72
     versioning-strategy: lockfile-only
-
+    cooldown:
+      default-days: 5
+    patterns:
+      - "*"
+    multi-ecosystem-group: bundler
+    ignore:
+      - dependency-name: rails
+        versions: ">= 8.0.0"
+      - dependency-name: rails-i18n
+        versions: ">= 8.0.0"
+      - dependency-name: railties
+        versions: ">= 8.0.0"
   - package-ecosystem: bundler
-    directory: /gemfiles/rails_61
-    schedule:
-      interval: daily
+    directory: /gemfiles/rails_80
     versioning-strategy: lockfile-only
-
-  - package-ecosystem: bundler
-    directory: /gemfiles/rails_61_turbolinks
-    schedule:
-      interval: daily
-    versioning-strategy: lockfile-only
-
-  - package-ecosystem: bundler
-    directory: /gemfiles/rails_61_webpacker
-    schedule:
-      interval: daily
-    versioning-strategy: lockfile-only
+    cooldown:
+      default-days: 5
+    patterns:
+      - "*"
+    multi-ecosystem-group: bundler
+    ignore:
+      - dependency-name: rails
+        versions: ">= 8.1.0"
+      - dependency-name: rails-i18n
+        versions: ">= 8.1.0"

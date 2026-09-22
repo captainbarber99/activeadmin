@@ -2,8 +2,8 @@
 require "rails_helper"
 
 RSpec.describe ActiveAdmin::Resource::BelongsTo do
-  before do
-    load_resources do
+  around do |example|
+    with_resources_during(example) do
       ActiveAdmin.register User
       ActiveAdmin.register(Post) { belongs_to :user }
     end
@@ -71,6 +71,22 @@ RSpec.describe ActiveAdmin::Resource::BelongsTo do
 
     it "should be able to build a new resource" do
       expect(controller.send :build_resource).to be_a Post
+    end
+  end
+
+  describe "method_for_association_chain (with `as:` alias)" do
+    around do |example|
+      with_resources_during(example) do
+        ActiveAdmin.register User
+        ActiveAdmin.register(Post, as: "Story") { belongs_to :user, optional: true }
+      end
+    end
+
+    let(:post_config) { ActiveAdmin.application.namespaces[:admin].resources["Story"] }
+    let(:controller) { post_config.controller.new }
+
+    it "derives the parent's association name from the resource's model class" do
+      expect(controller.send(:method_for_association_chain)).to eq(:posts)
     end
   end
 end

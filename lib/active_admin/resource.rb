@@ -1,19 +1,20 @@
 # frozen_string_literal: true
-require "active_admin/resource/action_items"
-require "active_admin/resource/attributes"
-require "active_admin/resource/controllers"
-require "active_admin/resource/menu"
-require "active_admin/resource/page_presenters"
-require "active_admin/resource/pagination"
-require "active_admin/resource/routes"
-require "active_admin/resource/naming"
-require "active_admin/resource/scopes"
-require "active_admin/resource/includes"
-require "active_admin/resource/scope_to"
-require "active_admin/resource/sidebars"
-require "active_admin/resource/belongs_to"
-require "active_admin/resource/ordering"
-require "active_admin/resource/model"
+require_relative "view_helpers/method_or_proc_helper"
+require_relative "resource/action_items"
+require_relative "resource/attributes"
+require_relative "resource/controllers"
+require_relative "resource/menu"
+require_relative "resource/page_presenters"
+require_relative "resource/pagination"
+require_relative "resource/routes"
+require_relative "resource/naming"
+require_relative "resource/scopes"
+require_relative "resource/includes"
+require_relative "resource/scope_to"
+require_relative "resource/sidebars"
+require_relative "resource/belongs_to"
+require_relative "resource/ordering"
+require_relative "resource/model"
 
 module ActiveAdmin
 
@@ -67,10 +68,15 @@ module ActiveAdmin
     # nil to not decorate.
     attr_accessor :decorator_class_name
 
+    # Default `filters` list for string filters on this resource. Takes
+    # priority over the namespace-level `string_input_filters` setting when
+    # set; when nil, falls back to it, and then to the global default.
+    attr_accessor :string_input_filters
+
     module Base
       def initialize(namespace, resource_class, options = {})
         @namespace = namespace
-        @resource_class_name = "::#{resource_class.name}"
+        @resource_class_name = resource_class.respond_to?(:name) ? "::#{resource_class.name}" : resource_class.to_s
         @options = options
         @sort_order = options[:sort_order]
         @member_actions = []
@@ -119,7 +125,9 @@ module ActiveAdmin
     end
 
     def resource_quoted_column_name(column)
-      resource_class.connection.quote_column_name(column)
+      resource_class.with_connection do |connection|
+        connection.quote_column_name(column)
+      end
     end
 
     # Clears all the member actions this resource knows about
@@ -176,7 +184,7 @@ module ActiveAdmin
     end
 
     def find_resource(id)
-      resource = resource_class.public_send *method_for_find(id)
+      resource = resource_class.public_send(*method_for_find(id))
       (decorator_class && resource) ? decorator_class.new(resource) : resource
     end
 

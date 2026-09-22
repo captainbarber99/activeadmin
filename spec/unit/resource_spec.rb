@@ -37,6 +37,12 @@ module ActiveAdmin
       end
     end
 
+    describe "#resource_quoted_column_name" do
+      it "should return quote argument" do
+        expect(config.resource_quoted_column_name('first_name')).to eq '"first_name"'
+      end
+    end
+
     describe "#decorator_class" do
       it "returns nil by default" do
         expect(config.decorator_class).to eq nil
@@ -54,6 +60,24 @@ module ActiveAdmin
 
         it "returns the decorator class" do
           expect(resource.decorator_class).to eq PostDecorator
+        end
+      end
+    end
+
+    describe "#string_input_filters" do
+      it "returns nil by default" do
+        expect(config.string_input_filters).to eq nil
+      end
+
+      context "when set via the DSL" do
+        around do |example|
+          with_resources_during(example) { resource }
+        end
+
+        let(:resource) { namespace.register(Post) { string_input_filters [:eq, :cont] } }
+
+        it "returns the configured filters" do
+          expect(resource.string_input_filters).to eq [:eq, :cont]
         end
       end
     end
@@ -198,7 +222,7 @@ module ActiveAdmin
         end
       end
 
-      it "should retrive a scope by its id" do
+      it "should retrieve a scope by its id" do
         config.scope :published
         expect(config.get_scope_by_id(:published).name).to eq "Published"
       end
@@ -218,7 +242,7 @@ module ActiveAdmin
       end
 
       context "when csv builder set" do
-        it "shuld return the csv_builder we set" do
+        it "should return the csv_builder we set" do
           csv_builder = CSVBuilder.new
           config.csv_builder = csv_builder
           expect(config.csv_builder).to eq csv_builder

@@ -1,10 +1,8 @@
 # frozen_string_literal: true
-source "https://rubygems.org"
+source "https://rubygems.org", cooldown: 5
 
 group :development, :test do
   gem "rake"
-  gem "pry" # Easily debug from your console with `binding.pry`
-  gem "pry-byebug", platform: :mri # Step-by-step debugging
 
   gem "cancancan"
   gem "pundit"
@@ -12,12 +10,14 @@ group :development, :test do
   gem "draper"
   gem "devise"
 
-  gem "rails", "~> 7.0.0"
-
-  gem "net-smtp" # The mail gem, depended on transitively, does not specify this dependency
+  gem "rails", "~> 8.1.0"
 
   gem "sprockets-rails"
-  gem "sassc-rails"
+  gem "ransack", ">= 4.2.0"
+  gem "formtastic", ">= 6.0.0"
+
+  gem "cssbundling-rails"
+  gem "importmap-rails"
 end
 
 group :test do
@@ -26,39 +26,27 @@ group :test do
   gem "webrick"
 
   gem "simplecov", require: false # Test coverage generator. Go to /coverage/ after running tests
+  gem "simplecov-cobertura", require: false
   gem "cucumber-rails", require: false
-  gem "cucumber"
-  gem "database_cleaner"
-  gem "jasmine"
-  gem "jasmine-core"
+  gem "database_cleaner-active_record"
   gem "launchy"
   gem "parallel_tests"
-  gem "rails-i18n" # Provides default i18n for many languages
   gem "rspec-rails"
   gem "sqlite3", platform: :mri
-end
-
-group :release do
-  gem "chandler" # Github releases from changelog
-  gem "octokit"
-end
-
-group :lint do
-  # Code style
-  gem "rubocop"
-  gem "rubocop-packaging"
-  gem "rubocop-rspec"
-  gem "rubocop-rails"
-  gem "mdl"
 
   # Translations
   gem "i18n-tasks"
   gem "i18n-spec"
+  gem "rails-i18n" # Provides default i18n for many languages
 end
 
-group :docs do
-  gem "yard" # Documentation generator
-  gem "kramdown" # Markdown implementation (for yard)
+group :rubocop do
+  gem "rubocop"
+  gem "rubocop-capybara"
+  gem "rubocop-packaging"
+  gem "rubocop-performance"
+  gem "rubocop-rspec"
+  gem "rubocop-rails"
 end
 
 gemspec path: "."
